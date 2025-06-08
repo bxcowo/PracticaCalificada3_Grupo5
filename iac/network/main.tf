@@ -6,10 +6,10 @@ locals {
   cidr_newbits = ceil(log(local.numero_subredes, 2)) + 2
 
   subredes_publicas = [
-    for i in var.zonas_disponibilidad : cidrsubnet(var.vpc_cidr, local.cidr_newbits, i)
+    for i, zd in var.zonas_disponibilidad : cidrsubnet(var.vpc_cidr, local.cidr_newbits, i)
   ]
   subredes_privadas = [
-    for i in var.zonas_disponibilidad : cidrsubnet(var.vpc_cidr, local.cidr_newbits, i + length(var.zonas_disponibilidad))
+    for i, zd in var.zonas_disponibilidad : cidrsubnet(var.vpc_cidr, local.cidr_newbits, i + length(var.zonas_disponibilidad))
   ]
 
   costo_nat_gateway_total = var.permitir_nat_gateway ? length(var.zonas_disponibilidad) * 45.0 : 0.0
