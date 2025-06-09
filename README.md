@@ -72,3 +72,11 @@ Aunque no haya aún una funcionalidad establecida, es posible acceder a este pro
 git clone https://github.com/bxcowo/PracticaCalificada3_Grupo5.git
 cd PracticaCalificada3_Grupo5
 ```
+
+
+# Entregables por sprint
+Aquí se encuentran los videos explicativos sobre la colaboración de cada uno de los integrantes, además de la sustentación de cada modificación, mencionando también posibles retos que se encuentren durante el desarrollo
+
+- **Video Sprint 1**: https://unipe-my.sharepoint.com/:v:/g/personal/a_flores_a_uni_pe/EaUcPsK_EINJk2p2Pyk5JXIBswQuvG7-clWvL5UooLAjYQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=zwEeWw
+
+
