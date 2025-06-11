@@ -24,9 +24,37 @@ def parse_outputs(modulo_path):
 def parse_resources(modulo_path):
     """
     Lee main.tf y extrae recursos (tipo, nombre).
+    Retorna: [{ "type": "<tipo>", "name": "<nombre>" }]
     """
-    # TODO: implementar parsing con regex
-    return []
+    main_tf_path = os.path.join(modulo_path, "main.tf")
+    
+    # Si no existe main.tf, retorna lista vacía sin excepciones
+    if not os.path.exists(main_tf_path):
+        return []
+    
+    try:
+        with open(main_tf_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Regex para extraer resource "<tipo>" "<nombre>"
+        # El patrón busca 'resource' seguido de dos strings entre comillas
+        pattern = r'resource\s+"([^"]+)"\s+"([^"]+)"'
+        matches = re.findall(pattern, content)
+        
+        # Convertir a formato de diccionarios
+        resources = []
+        for tipo, nombre in matches:
+            resources.append({
+                "type": tipo,
+                "name": nombre
+            })
+        
+        return resources
+        
+    except Exception as e:
+        # En caso de error al leer el archivo, retorna lista vacía
+        print(f"Error leyendo {main_tf_path}: {e}")
+        return []
 
 def write_markdown(modulos):
     """
@@ -42,8 +70,30 @@ def write_markdown(modulos):
 
 def main():
     root = os.path.join(os.path.dirname(__file__), "../iac")
-    # TODO: detectar carpetas de módulo y llamar a parse_*/write_markdown
-    pass
+    
+    # Test específico para el módulo network
+    network_path = os.path.join(root, "network")
+    print("Testing parse_resources for network module:")
+    print(f"Module path: {network_path}")
+    
+    network_resources = parse_resources(network_path)
+    print(f"Resources found in network module: {len(network_resources)}")
+    for resource in network_resources:
+        print(f"  - Type: {resource['type']}, Name: {resource['name']}")
+    
+    print("\nTesting parse_resources for all modules:")
+    # Detectar carpetas de módulo y probar parse_resources
+    if os.path.exists(root):
+        for item in os.listdir(root):
+            module_path = os.path.join(root, item)
+            if os.path.isdir(module_path):
+                print(f"\nModule: {item}")
+                resources = parse_resources(module_path)
+                if resources:
+                    for resource in resources:
+                        print(f"  - {resource['type']}.{resource['name']}")
+                else:
+                    print("  No resources found or main.tf not exists")
 
 if __name__ == "__main__":
     main() 
