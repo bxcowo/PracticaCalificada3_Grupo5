@@ -4,11 +4,31 @@ import os
 import re
 import sys
 
+
+PATRON_VALIDO =re.compile(r'^[a-z][a-z0-9_]+$')
+
+
 def main():
-    #TODO: Recorrer iac/ y verificar que cada nombre de modulo cumple con  el siguiente patron
-    #TODO: Registrar modulos que no cumplen con el patron de nombres
-    #TODO: Al final imprimir en consola los errores encontrado
-    pass 
+    errores = []
+
+    ruta="iac"
+    if not os.path.isdir(ruta):
+        print(f"ERROR: No se encontro el directorio '{ruta}' ")
+        sys.exit(1)
+
+    for nombre in os.listdir(ruta):
+        ruta_mod = os.path.join(ruta, nombre)
+        if os.path.isdir(ruta_mod):
+            if PATRON_VALIDO.match(nombre):
+                print(f"OK: {nombre} ")
+            else:
+                print(f"ERROR: {nombre} no cumple el patro designado")
+                errores.append(nombre)
+
+    if errores:
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
