@@ -166,5 +166,23 @@ def main():
                 else:
                     print("  No resources found or main.tf not exists")
 
+    # Test para función write_markdown()
+    print("\n\nTesting write_markdown for modules in iac")
+    write_markdown()
+    docs_route = os.path.join(os.path.dirname(__file__), "../docs")
+    print("Se han creado los siguientes archivos con el siguiente contenido:")
+    markdonws_creados = [file for file in os.listdir(docs_route) if os.path.isfile(os.path.join(docs_route, file))]
+
+    for doc in markdonws_creados:
+        file_path = os.path.join(docs_route, doc)
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                contenido = file.read()
+                print(f"Archivo: {doc}")
+                print(f"Contenido: \n{contenido}")
+                print("-" * 50)
+        except Exception as e:
+            print(f"Error al leer el archivo {doc}: {e}")
+
 if __name__ == "__main__":
     main()
