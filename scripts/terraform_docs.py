@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 scripts/terraform_docs.py
 Recorre cada módulo en iac/ y genera archivos Markdown en docs/<módulo>.md
@@ -6,6 +7,8 @@ Recorre cada módulo en iac/ y genera archivos Markdown en docs/<módulo>.md
 import os
 import re
 import json
+import sys
+from string import Template
 
 def parse_variables(modulo_path):
     """
@@ -27,20 +30,20 @@ def parse_resources(modulo_path):
     Retorna: [{ "type": "<tipo>", "name": "<nombre>" }]
     """
     main_tf_path = os.path.join(modulo_path, "main.tf")
-    
+
     # Si no existe main.tf, retorna lista vacía sin excepciones
     if not os.path.exists(main_tf_path):
         return []
-    
+
     try:
         with open(main_tf_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
         # Regex para extraer resource "<tipo>" "<nombre>"
         # El patrón busca 'resource' seguido de dos strings entre comillas
         pattern = r'resource\s+"([^"]+)"\s+"([^"]+)"'
         matches = re.findall(pattern, content)
-        
+
         # Convertir a formato de diccionarios
         resources = []
         for tipo, nombre in matches:
@@ -48,15 +51,15 @@ def parse_resources(modulo_path):
                 "type": tipo,
                 "name": nombre
             })
-        
+
         return resources
-        
+
     except Exception as e:
         # En caso de error al leer el archivo, retorna lista vacía
         print(f"Error leyendo {main_tf_path}: {e}")
         return []
 
-def write_markdown(modulos):
+def write_markdown():
     """
     Por cada módulo, escribe docs/<módulo>.md con:
     - Encabezado
@@ -65,22 +68,75 @@ def write_markdown(modulos):
     - Tabla de outputs
     - Lista de recursos
     """
-    # TODO: recorrer lista de módulos y generar Markdown
-    pass
+
+    # Definición de rutas de interes
+    root = os.path.join(os.path.dirname(__file__), "../iac")
+    docs_ruta = os.path.join(os.path.dirname(__file__), "../docs")
+
+    # Verificación de existencia de rutas
+    if not os.path.isdir(root):
+        print(f"ERROR: No se encontro el directorio '{root}' ")
+        sys.exit(1)
+
+    # Verificación de existencia de directorio 'docs', sino lo crea
+    if not os.path.isdir(docs_ruta):
+        print(f"ERROR: No se encontro el directorio '{docs_ruta}' ")
+        print("Creando...")
+        try:
+            os.mkdir(docs_ruta)
+        except PermissionError:
+            print("Permisos denegados")
+
+    # Declaración de plantilla para la documentación creada en Markdown
+    template_route = os.path.join(os.path.dirname(__file__), 'template.md')
+
+    with open(template_route, 'r', encoding='utf-8') as temp:
+        doc_template = Template(temp.read())
+
+    # Iteración por todos los módulos dentro del directorio iac
+    for nombre in os.listdir(root):
+        modulo_path = os.path.join(root, nombre)
+
+        # Descripción a realizarse por módulo (se espera una mejora en futuros avances)
+        descripcion = "Descripción placeholder"
+
+        # Obtención de información sobre variables en el módulo presente
+        parsed_variables = parse_variables(modulo_path)
+        filas_variables = "\n".join([f"| {var['name']} | {var['type']} | {var['default']} | {var['description']} |" for var in parsed_variables])
+
+        # Obtención de información sobre outputs en el módulo presente
+        parsed_outputs = parse_outputs(modulo_path)
+        filas_outputs = "\n".join([f"| {out['name']} | {out['description']} |" for out in parsed_outputs])
+
+        # Obtención de información sobre recursos en el módulo presente
+        parsed_recursos = parse_resources(modulo_path)
+        filas_recursos = "\n".join([f"{i+1}. \"{res['type']}\" \"{res['name']}\" " for i, res in enumerate(parsed_recursos)])
+
+        # Creación y escritura de archivo Markdown en base al template y a los datos obtenidos
+        with open(f'{docs_ruta}/{nombre}.md', 'w') as doc:
+            contenido = doc_template.substitute(
+                titulo = nombre,
+                descripcion = descripcion,
+                filas_variables = filas_variables,
+                filas_outputs = filas_outputs,
+                filas_recursos = filas_recursos
+            )
+            doc.write(contenido)
 
 def main():
     root = os.path.join(os.path.dirname(__file__), "../iac")
-    
+
+    # Test para función parse_resource()
     # Test específico para el módulo network
     network_path = os.path.join(root, "network")
     print("Testing parse_resources for network module:")
     print(f"Module path: {network_path}")
-    
+
     network_resources = parse_resources(network_path)
     print(f"Resources found in network module: {len(network_resources)}")
     for resource in network_resources:
         print(f"  - Type: {resource['type']}, Name: {resource['name']}")
-    
+
     print("\nTesting parse_resources for all modules:")
     # Detectar carpetas de módulo y probar parse_resources
     if os.path.exists(root):
@@ -95,5 +151,23 @@ def main():
                 else:
                     print("  No resources found or main.tf not exists")
 
+    # Test para función write_markdown()
+    print("\n\nTesting write_markdown for modules in iac")
+    write_markdown()
+    docs_route = os.path.join(os.path.dirname(__file__), "../docs")
+    print("Se han creado los siguientes archivos con el siguiente contenido:")
+    markdonws_creados = [file for file in os.listdir(docs_route) if os.path.isfile(os.path.join(docs_route, file))]
+
+    for doc in markdonws_creados:
+        file_path = os.path.join(docs_route, doc)
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                contenido = file.read()
+                print(f"Archivo: {doc}")
+                print(f"Contenido: \n{contenido}")
+                print("-" * 50)
+        except Exception as e:
+            print(f"Error al leer el archivo {doc}: {e}")
+
 if __name__ == "__main__":
-    main() 
+    main()
