@@ -88,25 +88,10 @@ def write_markdown():
             print("Permisos denegados")
 
     # Declaración de plantilla para la documentación creada en Markdown
-    doc_template = Template(
-        """# Módulo $titulo
+    template_route = os.path.join(os.path.dirname(__file__), 'template.md')
 
-$descripcion
-
-## Tabla de variables:
-| Nombre | Tipo | Default | Descripción |
-|--------|------|---------|-------------|
-$filas_variables
-
-## Tabla de outputs:
-| Nombre | Descripción |
-|--------|-------------|
-$filas_outputs
-
-## Lista de recursos:
-$filas_recursos
-    """
-    )
+    with open(template_route, 'r', encoding='utf-8') as temp:
+        doc_template = Template(temp.read())
 
     # Iteración por todos los módulos dentro del directorio iac
     for nombre in os.listdir(root):
