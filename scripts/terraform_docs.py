@@ -214,7 +214,7 @@ def write_markdown():
             print("Permisos denegados")
 
     # Declaración de plantilla para la documentación creada en Markdown
-    template_route = os.path.join(os.path.dirname(__file__), 'template.md')
+    template_route = os.path.join(os.path.dirname(__file__), 'templates', 'template.md')
 
     with open(template_route, 'r', encoding='utf-8') as temp:
         doc_template = Template(temp.read())
@@ -299,9 +299,10 @@ def main():
                 else:
                     print("  No resources found or main.tf not exists")
 
-    # Test para función write_markdown()
-    print("\n\nTesting write_markdown for modules in iac")
+    # Test para función write_markdown() y create_index()
+    print("\n\nTesting write_markdown for modules in iac and create_index")
     write_markdown()
+    create_index()
     docs_route = os.path.join(os.path.dirname(__file__), "../docs")
     print("Se han creado los siguientes archivos con el siguiente contenido:")
     markdonws_creados = [file for file in os.listdir(docs_route) if os.path.isfile(os.path.join(docs_route, file))]
