@@ -6,7 +6,7 @@ Descripción placeholder
 | Nombre | Tipo | Default | Descripción |
 |--------|------|---------|-------------|
 | vpc_cidr | string | "10.0.0.0/16" | Bloque CIDR declarada para una VPC(Virtual Private Cloud) |
-| zonas_disponibilidad | list(string) | N/A | Lista de zonas de disponibilidad a donde redistribuir los recursos existentes |
+| zonas_disponibilidad | list(string) | ["Canada", "USA", "Australia", "Peru"] | Lista de zonas de disponibilidad a donde redistribuir los recursos existentes |
 | permitir_nat_gateway | bool | true | Habilitar Gateway NAT para permitir acceso a internet desde subredes privadas. |
 
 ## Tabla de outputs:

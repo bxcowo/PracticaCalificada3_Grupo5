@@ -12,6 +12,7 @@ variable "vpc_cidr" {
 variable "zonas_disponibilidad" {
   description = "Lista de zonas de disponibilidad a donde redistribuir los recursos existentes"
   type        = list(string)
+  default     = ["Canada", "USA", "Australia", "Peru"]
 
   validation {
     condition     = length(var.zonas_disponibilidad) >= 2
