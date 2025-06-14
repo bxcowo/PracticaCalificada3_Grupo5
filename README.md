@@ -63,6 +63,7 @@ Dentro de la carpeta `scripts/` encontraremos 4 scripts fundamentales de nuestro
   - **_parse_outputs()_**: Lee el archivo `outputs.tf` de cada módulo y extrae los nombres y descripciones de las salidas definidas.
   - **_parse_resources()_**: Examina el archivo `main.tf` para identificar y extraer los recursos de Terraform (tipo y nombre) que se crean en el módulo.
   - **_write_markdown()_**: Genera archivos de documentación en formato Markdown para cada módulo, estructurando la información en secciones con encabezado, descripción, tablas de variables, de outputs y listas de recursos.
+  - **_create_index()_**: Genera el archivo índice principal `docs/index.md` que contiene enlaces a todos los módulos documentados y referencia al diagrama de red, proporcionando un punto de entrada unificado para toda la documentación.
 - **update_docs.sh**: Script bash principal para la automatización de documentación iterando sobre cada módulo de IaC, ejecutando los comandos `terraform init` y `terraform apply` para luego ejecutar los scripts `terraform_docs.py` y `generar_diagrama.py` para finalizar con el ciclo de ejecución principal de nuestro proyecto.
 - **verificar_nomenclatura.py**: Validador de nombres de módulos en el directorio `iac/` siguiendo un patrón de nomenclatura establecido, escanea e identifica posibles violaciones de nomenclatura y reporta cualquier nombre no conforme en la consola.
 
@@ -121,20 +122,58 @@ Script de automatización que ejecuta el flujo completo:
 - Retorno al directorio raíz para mantener consistencia de rutas
 - Preparación del entorno para la generación automatizada de documentación
 
+### Implementación de create_index() para generación automática del índice
+
+Desarrollo de la función `create_index()` que automatiza la creación del archivo índice principal:
+- Utiliza plantilla `template_index.md` para estructura consistente
+- Escaneo automático del directorio `iac/` para detectar módulos disponibles
+- Generación dinámica de enlaces Markdown a cada archivo de documentación
+- Integración con el flujo de trabajo de automatización
+- Creación de `docs/index.md` con navegación centralizada y referencia al diagrama de red
+
 ### Punto de entrada unificado con docs/index.md
 
-Creación del archivo índice principal que proporciona:
+El archivo índice generado automáticamente proporciona:
 - Encabezado estándar "Documentación de Módulos IaC"
-- Enlaces Markdown a cada archivo de documentación individual
-- Referencia preparatoria al diagrama de red (diagrama_red.svg)
+- Enlaces dinámicos a cada archivo de documentación individual
+- Referencia al diagrama de red (diagrama_red.svg)
 - Estructura de navegación centralizada para acceso directo a cualquier módulo
 
 
 ## 3. Instrucciones básicas de reproducibilidad:
 Aunque no haya aún una funcionalidad establecida, es posible acceder a este proyecto mediante los siguientes pasos:
 ```bash
+# 1. Clonar el repositorio
 git clone https://github.com/bxcowo/PracticaCalificada3_Grupo5.git
 cd PracticaCalificada3_Grupo5
+
+# 2. Verificar nomenclatura de módulos (opcional)
+python3 scripts/verificar_nomenclatura.py
+
+# 3. Ejecutar el proceso completo de documentación
+chmod +x scripts/update_docs.sh
+./scripts/update_docs.sh
+
+# 4. Ver la documentación generada
+cd docs/
+ls -la  # Verás todos los archivos .md generados
+```
+
+### Archivos generados:
+- `docs/index.md` - Índice principal con enlaces a todos los módulos
+- `docs/<módulo>.md` - Documentación individual de cada módulo
+- `docs/diagrama_red.dot` - Diagrama de red en formato DOT
+
+### Ejecución individual de componentes:
+```bash
+# Solo generar documentación Markdown
+python3 scripts/terraform_docs.py
+
+# Solo generar diagrama de red
+python3 scripts/generar_diagrama.py
+
+# Solo verificar nomenclatura
+python3 scripts/verificar_nomenclatura.py
 ```
 
 
