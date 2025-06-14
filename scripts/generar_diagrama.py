@@ -14,8 +14,8 @@ def generate_dot():
     """
     lineas=["digraph G {","rankdir=LR"]
 
-    root = os.path.join(os.path.dirname(__file__), "/iac")
-    patron = re.compile(r'^(?:module\.)?(.*)$')
+    root = os.path.join(os.path.dirname(__file__), "../iac")
+    patron = re.compile(r'^(?:data\.)?(.*)$')
 
     if not os.path.isdir(root):
         lineas.append("}")
@@ -40,12 +40,13 @@ def generate_dot():
             id_recurso = f"{type}.{name}"
             lineas.append(f'    "{id_recurso}" [label="{type}.{name}"]')
 
-            for dep in recurso.get('depends_on', []):
-                match = patron.match(dep)
-                if not match:
-                    continue
-                dep_id = match.group(1)
-                lineas.append(f'    "{dep_id}" -> "{id_recurso}"')
+            for instance in recurso.get('instances', []):
+                for dep in instance.get('dependencies', []):
+                    match = patron.match(dep)
+                    if not match:
+                        continue
+                    dep_id = match.group(1)
+                    lineas.append(f'    "{dep_id}" -> "{id_recurso}"')
 
     lineas.append("}")
     return "\n".join(lineas)
