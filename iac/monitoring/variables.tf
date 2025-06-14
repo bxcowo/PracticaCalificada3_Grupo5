@@ -7,6 +7,7 @@ variable "permite_monitoreo" {
 variable "email_alertas" {
   description = "Dirección de email para recibir alertas por monitoreo"
   type        = string
+  default     = "dummy123@gmail.com"
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.email_alertas))

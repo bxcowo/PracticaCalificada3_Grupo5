@@ -1,8 +1,33 @@
 #!/usr/bin/env bash
 
-set -e
+ROOT=$(pwd)
 
-# TODO: Iterar sobre cada modulo en iac/
-# TODO: Ejecutar 'terraform init & terraform apply --auto-approve' para cada modulo
-# TODO: Ejecutar 'python3 terraform_docs.py' para generar la documentacion en cada modulo
-# TODO: Ejecutar 'python3 generar_diagrama.py' para generar el archivo en DOT y SVG
+echo " Gneracndo documentacion y diagramas de los modulos de Terraform..."
+
+for modulo_dir in iac/*/; do 
+    if [ -d "$modulo_dir" ];then 
+        echo "Procesando modulo: $modulo_dir"
+        cd "$modulo_dir" || continue
+
+        echo "Ejecutando terraform init en $modulo_dir"
+        terraform init
+
+        echo "Ejecutando terraform apply --auto-approve en $modulo_dir"
+        if ! terraform apply --auto-approve; then
+            echo "Error: terraform apply falló en $modulo_dir"
+            exit 1
+        fi
+
+        cd "$ROOT"
+    else
+    echo "Carpeta $modulo_dir no es un directorio valido, omitiendo"
+    fi
+done
+
+echo "Generando documentaci+on con terraform_docs.py"
+python3 scripts/terraform_docs.py
+
+echo "Gnerando diagrama de red con generar_diagrama.py"
+python3 scripts/generar_diagrama.py
+
+echo "Generacion de documentacion completada."
