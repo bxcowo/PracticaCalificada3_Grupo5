@@ -6,7 +6,7 @@ Descripción placeholder
 | Nombre | Tipo | Default | Descripción |
 |--------|------|---------|-------------|
 | permite_monitoreo | bool | true | Permite un monitoreo detallado con alarmas |
-| email_alertas | string | N/A | Dirección de email para recibir alertas por monitoreo |
+| email_alertas | string | "dummy123@gmail.com" | Dirección de email para recibir alertas por monitoreo |
 | dias_retencion_metricas | number | 90 | Número de días de retención de métricas de recursos |
 
 ## Tabla de outputs:
