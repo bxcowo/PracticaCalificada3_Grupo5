@@ -11,7 +11,7 @@ PATRON_VALIDO =re.compile(r'^[a-z][a-z0-9_]+$')
 def main():
     errores = []
 
-    ruta="iac"
+    ruta=os.path.join(os.path.dirname(__file__), "../iac")
     if not os.path.isdir(ruta):
         print(f"ERROR: No se encontro el directorio '{ruta}' ")
         sys.exit(1)
