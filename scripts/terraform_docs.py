@@ -16,42 +16,42 @@ def parse_variables(modulo_path):
     Retorna: [{ "name": str, "type": str, "default": str, "description": str }]
     """
     variables_tf_path = os.path.join(modulo_path, "variables.tf")
-    
+
     # Si no existe variables.tf, retorna lista vacía sin excepciones
     if not os.path.exists(variables_tf_path):
         return []
-    
+
     try:
         with open(variables_tf_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
         # Regex para extraer bloques de variables completos
         # Busca 'variable "nombre" {' hasta el cierre del bloque con '}'
         # Usa un enfoque de conteo de llaves para manejar bloques anidados
         variables = []
-        
+
         # Patrón para encontrar el inicio de un bloque variable
         variable_pattern = r'variable\s+"([^"]+)"\s*\{'
-        
+
         # Encontrar todas las posiciones de inicio de variables
         for match in re.finditer(variable_pattern, content):
             var_name = match.group(1)
             start_pos = match.end()
-            
+
             # Encontrar el final del bloque contando llaves
             brace_count = 1
             end_pos = start_pos
-            
+
             while end_pos < len(content) and brace_count > 0:
                 if content[end_pos] == '{':
                     brace_count += 1
                 elif content[end_pos] == '}':
                     brace_count -= 1
                 end_pos += 1
-            
+
             # Extraer el contenido del bloque
             block_content = content[start_pos:end_pos-1]
-            
+
             # Extraer información específica del bloque
             var_info = {
                 "name": var_name,
@@ -59,17 +59,17 @@ def parse_variables(modulo_path):
                 "default": "N/A",  # valor por defecto
                 "description": "No description provided"  # valor por defecto
             }
-            
+
             # Extraer descripción
             desc_match = re.search(r'description\s*=\s*"([^"]*)"', block_content)
             if desc_match:
                 var_info["description"] = desc_match.group(1)
-            
+
             # Extraer tipo
             type_match = re.search(r'type\s*=\s*(\w+(?:\([^)]*\))?)', block_content)
             if type_match:
                 var_info["type"] = type_match.group(1)
-            
+
             # Extraer default (puede ser string, number, bool, list, etc.)
             # Buscar diferentes formatos de default
             default_match = re.search(r'default\s*=\s*([^}\n]*?)(?=\n|\s*validation|\s*$)', block_content, re.DOTALL)
@@ -80,11 +80,11 @@ def parse_variables(modulo_path):
                 default_value = default_value.strip()
                 if default_value:
                     var_info["default"] = default_value
-            
+
             variables.append(var_info)
-        
+
         return variables
-    
+
     except Exception as e:
         # En caso de error al leer el archivo, retorna lista vacía
         print(f"Error leyendo {variables_tf_path}: {e}")
@@ -96,55 +96,55 @@ def parse_outputs(modulo_path):
     Retorna: [{ "name": str, "description": str }]
     """
     outputs_tf_path = os.path.join(modulo_path, "outputs.tf")
-    
+
     # Si no existe outputs.tf, retorna lista vacía sin excepciones
     if not os.path.exists(outputs_tf_path):
         return []
-    
+
     try:
         with open(outputs_tf_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
+
         # Regex para extraer bloques de outputs completos
         outputs = []
-        
+
         # Patrón para encontrar el inicio de un bloque output
         output_pattern = r'output\s+"([^"]+)"\s*\{'
-        
+
         # Encontrar todas las posiciones de inicio de outputs
         for match in re.finditer(output_pattern, content):
             output_name = match.group(1)
             start_pos = match.end()
-            
+
             # Encontrar el final del bloque contando llaves
             brace_count = 1
             end_pos = start_pos
-            
+
             while end_pos < len(content) and brace_count > 0:
                 if content[end_pos] == '{':
                     brace_count += 1
                 elif content[end_pos] == '}':
                     brace_count -= 1
                 end_pos += 1
-            
+
             # Extraer el contenido del bloque
             block_content = content[start_pos:end_pos-1]
-            
+
             # Extraer información específica del bloque
             output_info = {
                 "name": output_name,
                 "description": "No description provided"  # valor por defecto
             }
-            
+
             # Extraer descripción
             desc_match = re.search(r'description\s*=\s*"([^"]*)"', block_content)
             if desc_match:
                 output_info["description"] = desc_match.group(1)
-            
+
             outputs.append(output_info)
-        
+
         return outputs
-    
+
     except Exception as e:
         # En caso de error al leer el archivo, retorna lista vacía
         print(f"Error leyendo {outputs_tf_path}: {e}")
@@ -248,6 +248,28 @@ def write_markdown():
                 filas_recursos = filas_recursos
             )
             doc.write(contenido)
+
+def create_index():
+    """
+    Dentro del directorio docs, escribe index.md.
+    Este archivo contiene enlaces a los resúmenes de los módulos encontrados,
+    también enlaza a un diagrama de red generado de estos módulos.`
+    """
+    root = os.path.join(os.path.dirname(__file__), '../iac')
+    docs_ruta = os.path.join(os.path.dirname(__file__), "../docs")
+    template_route = os.path.join(os.path.dirname(__file__), 'templates', 'template_index.md')
+
+    with open(template_route, 'r', encoding='utf-8') as temp:
+        index_template = Template(temp.read())
+
+    enlaces_filas = "\n".join([f'- [{nombre}]({nombre}.md)' for nombre in os.listdir(root)])
+
+    with open(os.path.join(docs_ruta, 'index.md'), 'w') as index:
+        contenido = index_template.substitute(
+            enlaces_filas = enlaces_filas
+        )
+        index.write(contenido)
+
 
 def main():
     root = os.path.join(os.path.dirname(__file__), "../iac")
