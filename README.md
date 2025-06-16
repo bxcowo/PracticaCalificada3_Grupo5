@@ -75,7 +75,7 @@ Durante este segundo sprint hemos completado la funcionalidad principal del sist
 
 Se completaron las funciones fundamentales que permiten la extracción automática de información desde los archivos Terraform:
 
-**parse_resources(modulo_path)**: 
+**parse_resources(modulo_path)**:
 - Analiza archivos `main.tf` utilizando expresiones regulares para identificar declaraciones de recursos
 - Extrae patrones `resource "<tipo>" "<nombre>"` y los estructura en diccionarios con claves "type" y "name"
 - Implementa manejo robusto de errores, retornando lista vacía cuando no existe el archivo main.tf
@@ -182,4 +182,5 @@ Aquí se encuentran los videos explicativos sobre la colaboración de cada uno d
 
 - **Video Sprint 1**: https://unipe-my.sharepoint.com/:v:/g/personal/a_flores_a_uni_pe/EaUcPsK_EINJk2p2Pyk5JXIBswQuvG7-clWvL5UooLAjYQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=zwEeWw
 
-
+- **Video Sprint 2**:
+https://unipe-my.sharepoint.com/:v:/g/personal/a_flores_a_uni_pe/EQx9SrEyp8tOjemAQ_W-fCYB6dVzZJMCIkIJDNh6bvSbYA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=3Yco2v
