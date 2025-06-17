@@ -1,0 +1,11 @@
+digraph G {
+rankdir=LR
+    "null_resource.config_almacenamiento" [label="null_resource.config_almacenamiento", color=yellow]
+    "terraform_remote_state.network" [label="terraform_remote_state.network", color=purple]
+    "null_resource.config_seguridad" [label="null_resource.config_seguridad", color=purple]
+    "terraform_remote_state.network" -> "null_resource.config_seguridad" [label="depends_on"]
+    "null_resource.config_logging" [label="null_resource.config_logging", color=green]
+    "null_resource.config_monitoreo" [label="null_resource.config_monitoreo", color=orange]
+    "null_resource.config_compute" [label="null_resource.config_compute", color=blue]
+    "null_resource.red_config" [label="null_resource.red_config", color=red]
+}
