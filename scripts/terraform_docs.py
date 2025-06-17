@@ -185,6 +185,42 @@ def parse_resources(modulo_path):
         print(f"Error leyendo {main_tf_path}: {e}")
         return []
 
+def parse_readme(modulo_path):
+    """
+    Lee el archivo README.md definido para cada módulo IaC
+    Retorna {'nombre_secciones': "<Contenido>", ...}
+    """
+    # Definimos el diccionario de contenido a almacenar
+    secciones = {}
+
+    # Extraemos el contenido del archivo README.md dentro del módulo
+    with open(os.path.join(modulo_path, "README.md"), 'r') as readme:
+        rd_content = readme.read()
+
+    # Dividimos el contenido en lineas diferentes y declaramos variables para los datos actuales
+    lineas = rd_content.split('\n')
+    curr_seccion = None
+    curr_content = []
+
+    # Iteramos linea por linea de texto verificando si una de ellas comienza con la notación de un sub header
+    for linea in lineas:
+        if linea.startswith('## '):
+            # Si lo fuese y estemos en una sección entonces la almacenamos dentro del diccionario de secciones
+            if curr_seccion:
+                secciones[curr_seccion] = '\n'.join(curr_content).strip()
+            # De forma predeterminada se asigna un valor a la sección actual y el contenido actual se reasigna
+            curr_seccion = linea[3:].strip()
+            curr_content = []
+        elif curr_seccion:
+            # Si no comenzase como subheader, entonces añadimos la nueva linea a nuestro contenido
+            curr_content.append(linea)
+
+    # Si terminamos de iterar en las lineas y aun seguimos en una sección entonces la asignamos
+    if curr_seccion:
+        secciones[curr_seccion] = '\n'.join(curr_content).strip()
+
+    return secciones
+
 def write_markdown():
     """
     Por cada módulo, escribe docs/<módulo>.md con:
