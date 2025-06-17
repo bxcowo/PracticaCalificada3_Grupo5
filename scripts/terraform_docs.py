@@ -259,9 +259,6 @@ def write_markdown():
     for nombre in os.listdir(root):
         modulo_path = os.path.join(root, nombre)
 
-        # Descripción a realizarse por módulo (se espera una mejora en futuros avances)
-        descripcion = "Descripción placeholder"
-
         # Obtención de información sobre variables en el módulo presente
         parsed_variables = parse_variables(modulo_path)
         filas_variables = "\n".join([f"| {var['name']} | {var['type']} | {var['default']} | {var['description']} |" for var in parsed_variables])
@@ -274,6 +271,11 @@ def write_markdown():
         parsed_recursos = parse_resources(modulo_path)
         filas_recursos = "\n".join([f"{i+1}. \"{res['type']}\" \"{res['name']}\" " for i, res in enumerate(parsed_recursos)])
 
+        # Obtención de descripción y el ejemplo de uso en bash sobre los módulos dentro de sus archivos README.md
+        parsed_readme = parse_readme(modulo_path)
+        descripcion = parsed_readme['Descripción']
+        ejemplo_bash = parsed_readme['Ejemplo de uso']
+
         # Creación y escritura de archivo Markdown en base al template y a los datos obtenidos
         with open(f'{docs_ruta}/{nombre}.md', 'w') as doc:
             contenido = doc_template.substitute(
@@ -281,7 +283,8 @@ def write_markdown():
                 descripcion = descripcion,
                 filas_variables = filas_variables,
                 filas_outputs = filas_outputs,
-                filas_recursos = filas_recursos
+                filas_recursos = filas_recursos,
+                ejemplo_bash = ejemplo_bash
             )
             doc.write(contenido)
 
