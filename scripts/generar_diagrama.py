@@ -2,15 +2,30 @@
 """
 scripts/generar_diagrama.py
 - Genera docs/diagrama_red.dot a partir de los .tfstate en cada módulo
+- Colorea nodos según tipo de módulo y etiqueta dependencias
 """
 import os
 import json
 import re
 
+def get_module_color(module_name):
+    """
+    Retorna el color DOT apropiado para cada tipo de módulo.
+    """
+    color_map = {
+        'network': 'blue',
+        'compute': 'green', 
+        'storage': 'orange',
+        'security': 'red',
+        'logging': 'purple',
+        'monitoring': 'yellow'
+    }
+    return color_map.get(module_name, 'gray')
+
 def generate_dot():
     """
     Lee terraform.tfstate de cada módulo (iac/<módulo>/terraform.tfstate)
-    y extrae dependencies para formar un grafo DOT.
+    y extrae dependencies para formar un grafo DOT con colores y etiquetas.
     """
     lineas=["digraph G {","rankdir=LR"]
 
@@ -20,6 +35,8 @@ def generate_dot():
     if not os.path.isdir(root):
         lineas.append("}")
         return "\n".join(lineas)
+
+    recurso_a_modulo = {}
 
     for modulo in os.listdir(root):
         modulo_dir=os.path.join(root, modulo)
@@ -34,11 +51,16 @@ def generate_dot():
         except (IOError, json.JSONDecodeError):
             continue
 
+        color = get_module_color(modulo)
+
         for recurso in data.get('resources', []):
             type= recurso.get('type')
             name = recurso.get('name')
             id_recurso = f"{type}.{name}"
-            lineas.append(f'    "{id_recurso}" [label="{type}.{name}"]')
+            
+            recurso_a_modulo[id_recurso] = modulo
+            
+            lineas.append(f'    "{id_recurso}" [label="{type}.{name}", color={color}]')
 
             for instance in recurso.get('instances', []):
                 for dep in instance.get('dependencies', []):
@@ -46,7 +68,8 @@ def generate_dot():
                     if not match:
                         continue
                     dep_id = match.group(1)
-                    lineas.append(f'    "{dep_id}" -> "{id_recurso}"')
+                    
+                    lineas.append(f'    "{dep_id}" -> "{id_recurso}" [label="depends_on"]')
 
     lineas.append("}")
     return "\n".join(lineas)
