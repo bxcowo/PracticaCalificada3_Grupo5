@@ -14,3 +14,6 @@ $filas_outputs
 
 ## Lista de recursos:
 $filas_recursos
+
+## Ejemplo de uso:
+$ejemplo_bash
