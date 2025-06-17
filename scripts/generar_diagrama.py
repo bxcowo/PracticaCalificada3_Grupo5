@@ -8,19 +8,27 @@ import os
 import json
 import re
 
-def get_module_color(module_name):
+def get_available_colors():
     """
-    Retorna el color DOT apropiado para cada tipo de módulo.
+    Retorna lista de colores disponibles para asignación a módulos.
+
     """
-    color_map = {
-        'network': 'blue',
-        'compute': 'green', 
-        'storage': 'orange',
-        'security': 'red',
-        'logging': 'purple',
-        'monitoring': 'yellow'
-    }
-    return color_map.get(module_name, 'gray')
+    return ['blue', 'green', 'orange', 'red', 'purple', 'yellow', 
+            'cyan', 'magenta', 'brown', 'pink', 'gray', 'darkgreen']
+
+def assign_module_colors(modulos):
+    """
+    Asigna colores de manera cíclica a una lista de módulos.
+    
+    """
+    colores_disponibles = get_available_colors()
+    mapeo_colores = {}
+    
+    for index, modulo in enumerate(sorted(modulos)):
+        color_index = index % len(colores_disponibles)
+        mapeo_colores[modulo] = colores_disponibles[color_index]
+    
+    return mapeo_colores
 
 def generate_dot():
     """
@@ -36,14 +44,21 @@ def generate_dot():
         lineas.append("}")
         return "\n".join(lineas)
 
+    # Identificar módulos disponibles
+    modulos_disponibles = []
+    for item in os.listdir(root):
+        modulo_dir = os.path.join(root, item)
+        tfstate = os.path.join(modulo_dir, "terraform.tfstate")
+        if os.path.isfile(tfstate):
+            modulos_disponibles.append(item)
+    
+    # Asignar colores
+    mapeo_colores = assign_module_colors(modulos_disponibles)
     recurso_a_modulo = {}
 
-    for modulo in os.listdir(root):
+    for modulo in modulos_disponibles:
         modulo_dir=os.path.join(root, modulo)
         tfstate=os.path.join(modulo_dir, "terraform.tfstate")
-
-        if not os.path.isfile(tfstate):
-            continue
 
         try:
             with open(tfstate, 'r', encoding='utf-8') as f:
@@ -51,7 +66,7 @@ def generate_dot():
         except (IOError, json.JSONDecodeError):
             continue
 
-        color = get_module_color(modulo)
+        color = mapeo_colores[modulo]
 
         for recurso in data.get('resources', []):
             type= recurso.get('type')
