@@ -140,7 +140,27 @@ El archivo índice generado automáticamente proporciona:
 - Estructura de navegación centralizada para acceso directo a cualquier módulo
 
 
+### Interpretacion del Diagrama de Red
+
+En el archivo `diagrama_red.svg` se logra vizualizar las dependencias entre los modulos de terraform que se tiene siguiendo las siguientes conveciones.
+
+#### **Colores por Modulo**
+
+- **Azul**: compute
+- **Verde**: logging
+- **Naranja**: monitoreo
+- **Rojo**: network
+- **Purpura**: seguridad
+- **Amarillo**: almacenamiento
+
+#### **Conexiones y Etiquetas**
+
+- **Flechas**: Indica la dependencia entre recursos
+- **Etiqueta "depends_on"**: Muestra que un recurso depende de otro
+- **Dirección**: La flecha que apunta desde la dependencia hacia el recurso dependiente
+
 ## 3. Instrucciones básicas de reproducibilidad:
+
 Aunque no haya aún una funcionalidad establecida, es posible acceder a este proyecto mediante los siguientes pasos:
 ```bash
 # 1. Clonar el repositorio
@@ -150,11 +170,24 @@ cd PracticaCalificada3_Grupo5
 # 2. Verificar nomenclatura de módulos (opcional)
 python3 scripts/verificar_nomenclatura.py
 
-# 3. Ejecutar el proceso completo de documentación
+# 3.Instalación de Graphviz
+
+Dado que el proyecto corre en linux instalaremos la dependencia mediante los siguientes comando pues solo usando esta dependencia podremos crear el SVG a partir del archivo .dot generado
+
+# Debian / Ubuntu
+
+sudo apt update
+sudo apt install graphviz
+
+# Arch Linux / Manjaro
+
+sudo pacman -S graphviz
+
+# 4. Ejecutar el proceso completo de documentación
 chmod +x scripts/update_docs.sh
 ./scripts/update_docs.sh
 
-# 4. Ver la documentación generada
+# 5. Ver la documentación generada
 cd docs/
 ls -la  # Verás todos los archivos .md generados
 ```
@@ -163,6 +196,9 @@ ls -la  # Verás todos los archivos .md generados
 - `docs/index.md` - Índice principal con enlaces a todos los módulos
 - `docs/<módulo>.md` - Documentación individual de cada módulo
 - `docs/diagrama_red.dot` - Diagrama de red en formato DOT
+- `docs/diagrama_red.svg` - Diagrama de red en formato SVG
+
+
 
 ### Ejecución individual de componentes:
 ```bash
@@ -173,6 +209,58 @@ python3 scripts/terraform_docs.py
 python3 scripts/generar_diagrama.py
 
 # Solo verificar nomenclatura
+python3 scripts/verificar_nomenclatura.py
+
+# Solo generar el archivo svg a partir de el archivo diagrama_red.dot
+dot -Tsvg docs/diagrama_red.dot -o docs/diagrama_red.svg
+
+```
+
+
+### Convenciones de Nomenclatura para Módulos
+
+El script `verificar_nomenclatura.py` valida que los nombres de módulos en `iac/` cumplan con el patrón establecido: `^[a-z][a-z0-9_]+$`
+
+#### **Ejemplos de nombres CORRECTOS:**
+```
+compute          # OK: minúsculas
+storage          # OK: minúsculas
+network          # OK: minúsculas
+monitoring       # OK: minúsculas
+security         # OK: minúsculas
+logging          # OK: minúsculas
+api_gateway      # OK: minúsculas con guión bajo
+data_pipeline    # OK: minúsculas con guión bajo
+web_server       # OK: minúsculas con guión bajo
+database_primary # OK: minúsculas con guión bajo
+cache_redis      # OK: minúsculas con guión bajo
+load_balancer    # OK: minúsculas con guión bajo
+backup_s3        # OK: minúsculas con números y guión bajo
+```
+
+#### **Ejemplos de nombres INCORRECTOS:**
+```
+Compute          # ERROR: Contiene mayúsculas
+STORAGE          # ERROR: Todo en mayúsculas
+Network-VPC      # ERROR: Contiene guión (-)
+api.gateway      # ERROR: Contiene punto (.)
+_monitoring      # ERROR: Comienza con guión bajo
+9security        # ERROR: Comienza con número
+web server       # ERROR: Contiene espacio
+database@prod    # ERROR: Contiene carácter especial (@)
+load-balancer    # ERROR: Contiene guión (-)
+API_Gateway      # ERROR: Contiene mayúsculas
+```
+
+#### **Reglas de nomenclatura:**
+- Debe comenzar con una letra minúscula (`a-z`)
+- Puede contener letras minúsculas, números y guiones bajos (`a-z`, `0-9`, `_`)
+- No puede contener mayúsculas, guiones (-), puntos (.), espacios o caracteres especiales
+- No puede comenzar con números o guiones bajos
+
+#### **Verificación:**
+```bash
+# Validar nomenclatura de todos los módulos
 python3 scripts/verificar_nomenclatura.py
 ```
 
