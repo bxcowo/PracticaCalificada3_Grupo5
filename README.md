@@ -159,7 +159,6 @@ En el archivo `diagrama_red.svg` se logra vizualizar las dependencias entre los 
 - **Etiqueta "depends_on"**: Muestra que un recurso depende de otro
 - **Dirección**: La flecha que apunta desde la dependencia hacia el recurso dependiente
 
-
 ## 3. Avances desarrollados en Sprint 3
 Dentro del alcance determinado para el sprint 3 se realizaron los siguiente cambios en el proyecto:
 
@@ -177,7 +176,6 @@ Para la construcción correcta de la documentación automatizada, se expandieron
 ### Guía de instalación de Graphviz y nomenclatura definida
 
 Los últimos cambios se realizaron dentro del archivo principal de `README.md` donde se amplió la sección de "Instrucciones básicas de reproduciibilidad" para corresponder a instrucciones de instalación del software Graphviz en sistemas Linux (Debian, Ubuntu y Arch) que serían de utilidad para la generación final del archivo `.svg` en el directorio `docs/**`. Así mismo también se añadió una sección de guia al usuario para que se entienda la correcta nomenclatura de los módulos IaC y que sean reconocidos mediante el script `verificar_nomenclatura.py`.
-
 
 ## 4. Instrucciones básicas de reproducibilidad:
 
