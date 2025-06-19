@@ -144,20 +144,20 @@ El archivo índice generado automáticamente proporciona:
 
 En el archivo `diagrama_red.svg` se logra vizualizar las dependencias entre los modulos de terraform que se tiene siguiendo las siguientes conveciones.
 
-#### Colores por Modulo
+#### **Colores por Modulo**
 
-- Azul: compute
-- Verde: logging
-- Naranja: monitoreo
-- Rojo: network
-- Purpura: seguridad
-- Amarillo: almacenamiento
+- **Azul**: compute
+- **Verde**: logging
+- **Naranja**: monitoreo
+- **Rojo**: network
+- **Purpura**: seguridad
+- **Amarillo**: almacenamiento
 
-#### Conexiones y Etiquetas
+#### **Conexiones y Etiquetas**
 
-- Flechas: Indica la dependencia entre recursos
-- Etiqueta "depends_on": Muestra que un recurso depende de otro
-- Dirección: La flecha que apunta desde la dependencia hacia el recurso dependiente
+- **Flechas**: Indica la dependencia entre recursos
+- **Etiqueta "depends_on"**: Muestra que un recurso depende de otro
+- **Dirección**: La flecha que apunta desde la dependencia hacia el recurso dependiente
 
 ## 3. Instrucciones básicas de reproducibilidad:
 
@@ -214,6 +214,54 @@ python3 scripts/verificar_nomenclatura.py
 # Solo generar el archivo svg a partir de el archivo diagrama_red.dot
 dot -Tsvg docs/diagrama_red.dot -o docs/diagrama_red.svg
 
+```
+
+
+### Convenciones de Nomenclatura para Módulos
+
+El script `verificar_nomenclatura.py` valida que los nombres de módulos en `iac/` cumplan con el patrón establecido: `^[a-z][a-z0-9_]+$`
+
+#### **Ejemplos de nombres CORRECTOS:**
+```
+compute          # OK: minúsculas
+storage          # OK: minúsculas
+network          # OK: minúsculas
+monitoring       # OK: minúsculas
+security         # OK: minúsculas
+logging          # OK: minúsculas
+api_gateway      # OK: minúsculas con guión bajo
+data_pipeline    # OK: minúsculas con guión bajo
+web_server       # OK: minúsculas con guión bajo
+database_primary # OK: minúsculas con guión bajo
+cache_redis      # OK: minúsculas con guión bajo
+load_balancer    # OK: minúsculas con guión bajo
+backup_s3        # OK: minúsculas con números y guión bajo
+```
+
+#### **Ejemplos de nombres INCORRECTOS:**
+```
+Compute          # ERROR: Contiene mayúsculas
+STORAGE          # ERROR: Todo en mayúsculas
+Network-VPC      # ERROR: Contiene guión (-)
+api.gateway      # ERROR: Contiene punto (.)
+_monitoring      # ERROR: Comienza con guión bajo
+9security        # ERROR: Comienza con número
+web server       # ERROR: Contiene espacio
+database@prod    # ERROR: Contiene carácter especial (@)
+load-balancer    # ERROR: Contiene guión (-)
+API_Gateway      # ERROR: Contiene mayúsculas
+```
+
+#### **Reglas de nomenclatura:**
+- Debe comenzar con una letra minúscula (`a-z`)
+- Puede contener letras minúsculas, números y guiones bajos (`a-z`, `0-9`, `_`)
+- No puede contener mayúsculas, guiones (-), puntos (.), espacios o caracteres especiales
+- No puede comenzar con números o guiones bajos
+
+#### **Verificación:**
+```bash
+# Validar nomenclatura de todos los módulos
+python3 scripts/verificar_nomenclatura.py
 ```
 
 
