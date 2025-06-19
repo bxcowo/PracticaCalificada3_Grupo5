@@ -141,6 +141,7 @@ El archivo índice generado automáticamente proporciona:
 
 
 ## 3. Instrucciones básicas de reproducibilidad:
+
 Aunque no haya aún una funcionalidad establecida, es posible acceder a este proyecto mediante los siguientes pasos:
 ```bash
 # 1. Clonar el repositorio
@@ -150,11 +151,24 @@ cd PracticaCalificada3_Grupo5
 # 2. Verificar nomenclatura de módulos (opcional)
 python3 scripts/verificar_nomenclatura.py
 
-# 3. Ejecutar el proceso completo de documentación
+# 3.Instalación de Graphviz
+
+Dado que el proyecto corre en linux instalaremos la dependencia mediante los siguientes comando pues solo usando esta dependencia podremos crear el SVG a partir del archivo .dot generado
+
+# Debian / Ubuntu
+
+sudo apt update
+sudo apt install graphviz
+
+# Arch Linux / Manjaro
+
+sudo pacman -S graphviz
+
+# 4. Ejecutar el proceso completo de documentación
 chmod +x scripts/update_docs.sh
 ./scripts/update_docs.sh
 
-# 4. Ver la documentación generada
+# 5. Ver la documentación generada
 cd docs/
 ls -la  # Verás todos los archivos .md generados
 ```
@@ -163,6 +177,9 @@ ls -la  # Verás todos los archivos .md generados
 - `docs/index.md` - Índice principal con enlaces a todos los módulos
 - `docs/<módulo>.md` - Documentación individual de cada módulo
 - `docs/diagrama_red.dot` - Diagrama de red en formato DOT
+- `docs/diagrama_red.svg` - Diagrama de red en formato SVG
+
+
 
 ### Ejecución individual de componentes:
 ```bash
@@ -174,6 +191,10 @@ python3 scripts/generar_diagrama.py
 
 # Solo verificar nomenclatura
 python3 scripts/verificar_nomenclatura.py
+
+# Solo generar el archivo svg a partir de el archivo diagrama_red.dot
+dot -Tsvg docs/diagrama_red.dot -o docs/diagrama_red.svg
+
 ```
 
 
