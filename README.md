@@ -140,6 +140,25 @@ El archivo índice generado automáticamente proporciona:
 - Estructura de navegación centralizada para acceso directo a cualquier módulo
 
 
+### Interpretacion del Diagrama de Red
+
+En el archivo `diagrama_red.svg` se logra vizualizar las dependencias entre los modulos de terraform que se tiene siguiendo las siguientes conveciones.
+
+#### Colores por Modulo
+
+- Azul: compute
+- Verde: logging
+- Naranja: monitoreo
+- Rojo: network
+- Purpura: seguridad
+- Amarillo: almacenamiento
+
+#### Conexiones y Etiquetas
+
+- Flechas: Indica la dependencia entre recursos
+- Etiqueta "depends_on": Muestra que un recurso depende de otro
+- Dirección: La flecha que apunta desde la dependencia hacia el recurso dependiente
+
 ## 3. Instrucciones básicas de reproducibilidad:
 
 Aunque no haya aún una funcionalidad establecida, es posible acceder a este proyecto mediante los siguientes pasos:
