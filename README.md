@@ -140,7 +140,47 @@ El archivo índice generado automáticamente proporciona:
 - Estructura de navegación centralizada para acceso directo a cualquier módulo
 
 
-## 3. Instrucciones básicas de reproducibilidad:
+### Interpretacion del Diagrama de Red
+
+En el archivo `diagrama_red.svg` se logra vizualizar las dependencias entre los modulos de terraform que se tiene siguiendo las siguientes conveciones.
+
+#### **Colores por Modulo**
+
+- **Azul**: compute
+- **Verde**: logging
+- **Naranja**: monitoreo
+- **Rojo**: network
+- **Purpura**: seguridad
+- **Amarillo**: almacenamiento
+
+#### **Conexiones y Etiquetas**
+
+- **Flechas**: Indica la dependencia entre recursos
+- **Etiqueta "depends_on"**: Muestra que un recurso depende de otro
+- **Dirección**: La flecha que apunta desde la dependencia hacia el recurso dependiente
+
+
+## 3. Avances desarrollados en Sprint 3
+Dentro del alcance determinado para el sprint 3 se realizaron los siguiente cambios en el proyecto:
+
+### Mejoría en `update_docs.sh`
+Se dio una modificación en el archivo `update_docs.sh` para realizar una limpieza final de todas las ejecuciones de `terraform apply` mediante el comando `terraform destroy`. Esta implementación fue necesaria para asegurar que el proceso de documentación sea completamente reproducible y no deje archivos de estado residuales que puedan interferir con futuras ejecuciones. El script ahora garantiza un entorno limpio después de cada ciclo de generación de documentación, eliminando cualquier recurso temporal creado durante el proceso de apply.
+
+### Estilizar nodos y etiquetas en `diagrama_red.dot`
+
+Se implementaron mejoras visuales significativas en la generación del diagrama de red mediante la aplicación de estilos diferenciados por módulo. Cada nodo del diagrama ahora presenta colores específicos facilitando la identificación visual de los componentes de infraestructura. Las conexiones entre recursos se representan mediante flechas etiquetadas que indican claramente las dependencias. Esta estilización permite una interpretación más intuitiva de las relaciones entre módulos y mejora sustancialmente la legibilidad del diagrama generado.
+
+### Completitud de módulos mediante `README.md`
+
+Para la construcción correcta de la documentación automatizada, se expandieron los módulos de Terraform definidos mediante un archivo `README.md` incluido dentro de cada uno que incluyese una descripción de su utilidad y un ejemplo de uso mediante un comando bash con declaración de variables. Estos añadidos dieron los toques finales para la documentación automatizada de cada uno de los archivo Markdown dentro de `docs/**` fundamentalmente completando con el objetivo deseado del proyecto.
+
+### Guía de instalación de Graphviz y nomenclatura definida
+
+Los últimos cambios se realizaron dentro del archivo principal de `README.md` donde se amplió la sección de "Instrucciones básicas de reproduciibilidad" para corresponder a instrucciones de instalación del software Graphviz en sistemas Linux (Debian, Ubuntu y Arch) que serían de utilidad para la generación final del archivo `.svg` en el directorio `docs/**`. Así mismo también se añadió una sección de guia al usuario para que se entienda la correcta nomenclatura de los módulos IaC y que sean reconocidos mediante el script `verificar_nomenclatura.py`.
+
+
+## 4. Instrucciones básicas de reproducibilidad:
+
 Aunque no haya aún una funcionalidad establecida, es posible acceder a este proyecto mediante los siguientes pasos:
 ```bash
 # 1. Clonar el repositorio
@@ -150,11 +190,24 @@ cd PracticaCalificada3_Grupo5
 # 2. Verificar nomenclatura de módulos (opcional)
 python3 scripts/verificar_nomenclatura.py
 
-# 3. Ejecutar el proceso completo de documentación
+# 3.Instalación de Graphviz
+
+Dado que el proyecto corre en linux instalaremos la dependencia mediante los siguientes comando pues solo usando esta dependencia podremos crear el SVG a partir del archivo .dot generado
+
+# Debian / Ubuntu
+
+sudo apt update
+sudo apt install graphviz
+
+# Arch Linux / Manjaro
+
+sudo pacman -S graphviz
+
+# 4. Ejecutar el proceso completo de documentación
 chmod +x scripts/update_docs.sh
 ./scripts/update_docs.sh
 
-# 4. Ver la documentación generada
+# 5. Ver la documentación generada
 cd docs/
 ls -la  # Verás todos los archivos .md generados
 ```
@@ -163,6 +216,9 @@ ls -la  # Verás todos los archivos .md generados
 - `docs/index.md` - Índice principal con enlaces a todos los módulos
 - `docs/<módulo>.md` - Documentación individual de cada módulo
 - `docs/diagrama_red.dot` - Diagrama de red en formato DOT
+- `docs/diagrama_red.svg` - Diagrama de red en formato SVG
+
+
 
 ### Ejecución individual de componentes:
 ```bash
@@ -173,6 +229,58 @@ python3 scripts/terraform_docs.py
 python3 scripts/generar_diagrama.py
 
 # Solo verificar nomenclatura
+python3 scripts/verificar_nomenclatura.py
+
+# Solo generar el archivo svg a partir de el archivo diagrama_red.dot
+dot -Tsvg docs/diagrama_red.dot -o docs/diagrama_red.svg
+
+```
+
+
+### Convenciones de Nomenclatura para Módulos
+
+El script `verificar_nomenclatura.py` valida que los nombres de módulos en `iac/` cumplan con el patrón establecido: `^[a-z][a-z0-9_]+$`
+
+#### **Ejemplos de nombres CORRECTOS:**
+```
+compute          # OK: minúsculas
+storage          # OK: minúsculas
+network          # OK: minúsculas
+monitoring       # OK: minúsculas
+security         # OK: minúsculas
+logging          # OK: minúsculas
+api_gateway      # OK: minúsculas con guión bajo
+data_pipeline    # OK: minúsculas con guión bajo
+web_server       # OK: minúsculas con guión bajo
+database_primary # OK: minúsculas con guión bajo
+cache_redis      # OK: minúsculas con guión bajo
+load_balancer    # OK: minúsculas con guión bajo
+backup_s3        # OK: minúsculas con números y guión bajo
+```
+
+#### **Ejemplos de nombres INCORRECTOS:**
+```
+Compute          # ERROR: Contiene mayúsculas
+STORAGE          # ERROR: Todo en mayúsculas
+Network-VPC      # ERROR: Contiene guión (-)
+api.gateway      # ERROR: Contiene punto (.)
+_monitoring      # ERROR: Comienza con guión bajo
+9security        # ERROR: Comienza con número
+web server       # ERROR: Contiene espacio
+database@prod    # ERROR: Contiene carácter especial (@)
+load-balancer    # ERROR: Contiene guión (-)
+API_Gateway      # ERROR: Contiene mayúsculas
+```
+
+#### **Reglas de nomenclatura:**
+- Debe comenzar con una letra minúscula (`a-z`)
+- Puede contener letras minúsculas, números y guiones bajos (`a-z`, `0-9`, `_`)
+- No puede contener mayúsculas, guiones (-), puntos (.), espacios o caracteres especiales
+- No puede comenzar con números o guiones bajos
+
+#### **Verificación:**
+```bash
+# Validar nomenclatura de todos los módulos
 python3 scripts/verificar_nomenclatura.py
 ```
 
