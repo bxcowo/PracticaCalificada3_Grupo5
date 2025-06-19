@@ -159,7 +159,25 @@ En el archivo `diagrama_red.svg` se logra vizualizar las dependencias entre los 
 - **Etiqueta "depends_on"**: Muestra que un recurso depende de otro
 - **Dirección**: La flecha que apunta desde la dependencia hacia el recurso dependiente
 
-## 3. Instrucciones básicas de reproducibilidad:
+## 3. Avances desarrollados en Sprint 3
+Dentro del alcance determinado para el sprint 3 se realizaron los siguiente cambios en el proyecto:
+
+### Mejoría en `update_docs.sh`
+Se dio una modificación en el archivo `update_docs.sh` para realizar una limpieza final de todas las ejecuciones de `terraform apply` mediante el comando `terraform destroy`. Esta implementación fue necesaria para asegurar que el proceso de documentación sea completamente reproducible y no deje archivos de estado residuales que puedan interferir con futuras ejecuciones. El script ahora garantiza un entorno limpio después de cada ciclo de generación de documentación, eliminando cualquier recurso temporal creado durante el proceso de apply.
+
+### Estilizar nodos y etiquetas en `diagrama_red.dot`
+
+Se implementaron mejoras visuales significativas en la generación del diagrama de red mediante la aplicación de estilos diferenciados por módulo. Cada nodo del diagrama ahora presenta colores específicos facilitando la identificación visual de los componentes de infraestructura. Las conexiones entre recursos se representan mediante flechas etiquetadas que indican claramente las dependencias. Esta estilización permite una interpretación más intuitiva de las relaciones entre módulos y mejora sustancialmente la legibilidad del diagrama generado.
+
+### Completitud de módulos mediante `README.md`
+
+Para la construcción correcta de la documentación automatizada, se expandieron los módulos de Terraform definidos mediante un archivo `README.md` incluido dentro de cada uno que incluyese una descripción de su utilidad y un ejemplo de uso mediante un comando bash con declaración de variables. Estos añadidos dieron los toques finales para la documentación automatizada de cada uno de los archivo Markdown dentro de `docs/**` fundamentalmente completando con el objetivo deseado del proyecto.
+
+### Guía de instalación de Graphviz y nomenclatura definida
+
+Los últimos cambios se realizaron dentro del archivo principal de `README.md` donde se amplió la sección de "Instrucciones básicas de reproduciibilidad" para corresponder a instrucciones de instalación del software Graphviz en sistemas Linux (Debian, Ubuntu y Arch) que serían de utilidad para la generación final del archivo `.svg` en el directorio `docs/**`. Así mismo también se añadió una sección de guia al usuario para que se entienda la correcta nomenclatura de los módulos IaC y que sean reconocidos mediante el script `verificar_nomenclatura.py`.
+
+## 4. Instrucciones básicas de reproducibilidad:
 
 Aunque no haya aún una funcionalidad establecida, es posible acceder a este proyecto mediante los siguientes pasos:
 ```bash
