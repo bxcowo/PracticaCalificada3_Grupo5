@@ -3,10 +3,13 @@
 scripts/generar_diagrama.py
 - Genera docs/diagrama_red.dot a partir de los .tfstate en cada módulo
 - Colorea nodos según tipo de módulo y etiqueta dependencias
+- Convierte automáticamente el archivo DOT a SVG usando Graphviz
 """
 import os
 import json
 import re
+import subprocess
+import sys
 
 def get_available_colors():
     """
@@ -89,15 +92,65 @@ def generate_dot():
     lineas.append("}")
     return "\n".join(lineas)
 
+def generate_svg_from_dot(dot_file_path, svg_file_path):
+    """
+    Convierte un archivo DOT a SVG usando el comando dot de Graphviz.
+    
+    Args:
+        dot_file_path (str): Ruta al archivo DOT de entrada
+        svg_file_path (str): Ruta al archivo SVG de salida
+    
+    Returns:
+        bool: True si la conversión fue exitosa, False en caso contrario
+    """
+    try:
+        # Verificar que el archivo DOT existe
+        if not os.path.isfile(dot_file_path):
+            print(f"Error: El archivo DOT {dot_file_path} no existe")
+            return False
+        
+        # Ejecutar comando dot para generar SVG
+        cmd = ["dot", "-Tsvg", dot_file_path, "-o", svg_file_path]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        
+        # Verificar que el archivo SVG se creó correctamente
+        if os.path.isfile(svg_file_path):
+            print(f"Diagrama SVG generado exitosamente en {svg_file_path}")
+            return True
+        else:
+            print(f"Error: No se pudo crear el archivo SVG {svg_file_path}")
+            return False
+            
+    except subprocess.CalledProcessError as e:
+        print(f"Error ejecutando comando dot: {e}")
+        print(f"stderr: {e.stderr}")
+        return False
+    except FileNotFoundError:
+        print("Error: comando 'dot' no encontrado. Asegúrese de que Graphviz esté instalado")
+        print("En sistemas Ubuntu/Debian: sudo apt-get install graphviz")
+        return False
+    except Exception as e:
+        print(f"Error inesperado al generar SVG: {e}")
+        return False
 
 def main():
     
     dot= generate_dot()
     os.makedirs("docs", exist_ok=True)
-    output="docs/diagrama_red.dot"
-    with open(output, 'w', encoding='utf-8') as f:
+    dot_output="docs/diagrama_red.dot"
+    svg_output="docs/diagrama_red.svg"
+    
+    # Escribir archivo DOT
+    with open(dot_output, 'w', encoding='utf-8') as f:
         f.write(dot)
-    print(f"Diagrama generado en {output}")
+    print(f"Diagrama DOT generado en {dot_output}")
+    
+    # Generar archivo SVG
+    if generate_svg_from_dot(dot_output, svg_output):
+        print(f"Proceso completado: archivos DOT y SVG disponibles en docs/")
+    else:
+        print("Advertencia: El archivo DOT se generó pero falló la conversión a SVG")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main() 
