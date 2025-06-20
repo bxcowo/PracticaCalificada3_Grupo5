@@ -32,7 +32,7 @@ python3 scripts/generar_diagrama.py
 
 # Limpiar de archivos realizando terraform destroy en cada modulo
 echo "Iniciando limpieza de recursos de cada modulo..."
-for modulo_dir in iac/*/; do
+for modulo_dir in $(ls -1d iac/*/ | sort -r); do
     if [ -d "$modulo_dir" ]; then
         echo "Destruyendo recursos en $modulo_dir"
         cd "$modulo_dir" 
