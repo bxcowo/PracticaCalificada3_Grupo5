@@ -27,24 +27,27 @@ Para este 1º sprint hemos desarrollado la siguiente estructura de directorios y
 ```
 
 ## 1. Avances desarrollados:
+
 Nuestro alcance establecido en este 1º sprint fue la de cimentar la estructura del proyecto a desarrollar. Se dio una división estructural entre los módulos de Terraform correspondientes y los scripts principales en sus respectivos directorios.
 Dentro de la carpeta `iac/` se tienen divididos 6 módulos principales:
-|  |  |
+| | |
 |---|---|
-| compute   | storage   |
-| logging  | security   |
-| monitoring   | network   |
+| compute | storage |
+| logging | security |
+| monitoring | network |
 
 Cada uno de estos módulos se descompone en 3 archivos Terraform estándar:
 
 - **main.tf**: Contiene la lógica principal del módulo utilizando `null_resource` con provisioners `local-exec` para simular la configuración de infraestructura. Incluye bloques `locals` que realizan cálculos específicos como:
+
   - Generación de hashes MD5 para triggers de configuración
   - Cálculos de costos estimados (NAT Gateway, monitoreo, logging)
   - Lógica condicional para configuraciones (alertas, políticas de seguridad, estrategias de backup)
   - Procesamiento de listas y mapas (subredes, políticas, tiers de almacenamiento)
 
 - **variables.tf**: Define las variables de entrada con validaciones robustas específicas para cada dominio:
-  - **_compute**: Comprobación de tipos de instancia e IDs de subred
+
+  - **\_compute**: Comprobación de tipos de instancia e IDs de subred
   - **_logging_**: Rangos de retención y niveles de log válidos
   - **_monitoring_**: Chequeo de formato de email y rangos de retención de métricas
   - **_network_**: Validación de bloques CIDR y zonas de disponibilidad mínimas
@@ -57,6 +60,7 @@ Cada uno de estos módulos se descompone en 3 archivos Terraform estándar:
   - Datos derivados de los cálculos en `locals` (direcciones de subredes, políticas de seguridad, estimaciones de costo)
 
 Dentro de la carpeta `scripts/` encontraremos 4 scripts fundamentales de nuestro proyecto:
+
 - **generar_diagrama.py**: Genera un diagrama de red en formato DOT mediante la función `generate_dot()` leyendo los archivos de Terraform de estado `(.tfstate)` de cada módulo. Se espera crear una representación visual de la infraestructura y generar una salida en el directorio `docs/`.
 - **terraform_docs.py**: Script python principal con 4 funciones fundamentales de operación:
   - **_parse_variables()_**: Analiza el archivo `variables.tf` de cada módulo y extrae los nombres, tipos, valores predeterminados y descripciones de las variables.
@@ -76,12 +80,14 @@ Durante este segundo sprint hemos completado la funcionalidad principal del sist
 Se completaron las funciones fundamentales que permiten la extracción automática de información desde los archivos Terraform:
 
 **parse_resources(modulo_path)**:
+
 - Analiza archivos `main.tf` utilizando expresiones regulares para identificar declaraciones de recursos
 - Extrae patrones `resource "<tipo>" "<nombre>"` y los estructura en diccionarios con claves "type" y "name"
 - Implementa manejo robusto de errores, retornando lista vacía cuando no existe el archivo main.tf
 - Probado exitosamente en todos los módulos, identificando recursos tipo `null_resource` en cada uno
 
 **parse_variables(modulo_path)**:
+
 - Lee archivos `variables.tf` implementando parsing avanzado con regex y conteo de llaves para manejar bloques anidados
 - Extrae información completa de variables: nombre, tipo, valor por defecto y descripción
 - Maneja bloques de validación anidados sin interferir con la extracción principal
@@ -89,6 +95,7 @@ Se completaron las funciones fundamentales que permiten la extracción automáti
 - Procesamiento exitoso de 18 variables distribuidas entre los 6 módulos
 
 **parse_outputs(modulo_path)**:
+
 - Procesa archivos `outputs.tf` utilizando técnicas similares de parsing con conteo de llaves
 - Extrae nombre y descripción de cada output definido
 - Estructura los datos en diccionarios con claves "name" y "description"
@@ -98,6 +105,7 @@ Se completaron las funciones fundamentales que permiten la extracción automáti
 ### Validación de nomenclatura con verificar_nomenclatura.py
 
 Se implementó el sistema de validación de convenciones de nomenclatura:
+
 - Escaneo automático del directorio `iac/` aplicando regex
 - Reporte estructurado con mensajes "OK: <módulo>" para nombres válidos
 - Identificación de violaciones con "ERROR: <módulo> no cumple convención"
@@ -107,6 +115,7 @@ Se implementó el sistema de validación de convenciones de nomenclatura:
 ### Generación automatizada de documentación Markdown
 
 La función `write_markdown()` produce documentación estructurada para cada módulo:
+
 - Encabezados consistentes con formato `# Módulo <nombre>`
 - Secciones organizadas: descripción placeholder, tablas de variables, tablas de outputs, lista de recursos
 - Integración completa con las funciones de parsing implementadas
@@ -116,6 +125,7 @@ La función `write_markdown()` produce documentación estructurada para cada mó
 ### Automatización completa con update_docs.sh
 
 Script de automatización que ejecuta el flujo completo:
+
 - Iteración sobre cada módulo en `iac/` ejecutando `terraform init` y `terraform apply -auto-approve`
 - Manejo de errores con terminación apropiada en caso de fallos de Terraform
 - Ejecución secuencial de `terraform_docs.py` y `generar_diagrama.py`
@@ -125,6 +135,7 @@ Script de automatización que ejecuta el flujo completo:
 ### Implementación de create_index() para generación automática del índice
 
 Desarrollo de la función `create_index()` que automatiza la creación del archivo índice principal:
+
 - Utiliza plantilla `template_index.md` para estructura consistente
 - Escaneo automático del directorio `iac/` para detectar módulos disponibles
 - Generación dinámica de enlaces Markdown a cada archivo de documentación
@@ -134,11 +145,11 @@ Desarrollo de la función `create_index()` que automatiza la creación del archi
 ### Punto de entrada unificado con docs/index.md
 
 El archivo índice generado automáticamente proporciona:
+
 - Encabezado estándar "Documentación de Módulos IaC"
 - Enlaces dinámicos a cada archivo de documentación individual
 - Referencia al diagrama de red (diagrama_red.svg)
 - Estructura de navegación centralizada para acceso directo a cualquier módulo
-
 
 ### Interpretacion del Diagrama de Red
 
@@ -160,9 +171,11 @@ En el archivo `diagrama_red.svg` se logra vizualizar las dependencias entre los 
 - **Dirección**: La flecha que apunta desde la dependencia hacia el recurso dependiente
 
 ## 3. Avances desarrollados en Sprint 3
+
 Dentro del alcance determinado para el sprint 3 se realizaron los siguiente cambios en el proyecto:
 
 ### Mejoría en `update_docs.sh`
+
 Se dio una modificación en el archivo `update_docs.sh` para realizar una limpieza final de todas las ejecuciones de `terraform apply` mediante el comando `terraform destroy`. Esta implementación fue necesaria para asegurar que el proceso de documentación sea completamente reproducible y no deje archivos de estado residuales que puedan interferir con futuras ejecuciones. El script ahora garantiza un entorno limpio después de cada ciclo de generación de documentación, eliminando cualquier recurso temporal creado durante el proceso de apply.
 
 ### Estilizar nodos y etiquetas en `diagrama_red.dot`
@@ -180,6 +193,7 @@ Los últimos cambios se realizaron dentro del archivo principal de `README.md` d
 ## 4. Instrucciones básicas de reproducibilidad:
 
 Aunque no haya aún una funcionalidad establecida, es posible acceder a este proyecto mediante los siguientes pasos:
+
 ```bash
 # 1. Clonar el repositorio
 git clone https://github.com/bxcowo/PracticaCalificada3_Grupo5.git
@@ -211,14 +225,14 @@ ls -la  # Verás todos los archivos .md generados
 ```
 
 ### Archivos generados:
+
 - `docs/index.md` - Índice principal con enlaces a todos los módulos
 - `docs/<módulo>.md` - Documentación individual de cada módulo
 - `docs/diagrama_red.dot` - Diagrama de red en formato DOT
 - `docs/diagrama_red.svg` - Diagrama de red en formato SVG
 
-
-
 ### Ejecución individual de componentes:
+
 ```bash
 # Solo generar documentación Markdown
 python3 scripts/terraform_docs.py
@@ -234,12 +248,12 @@ dot -Tsvg docs/diagrama_red.dot -o docs/diagrama_red.svg
 
 ```
 
-
 ### Convenciones de Nomenclatura para Módulos
 
 El script `verificar_nomenclatura.py` valida que los nombres de módulos en `iac/` cumplan con el patrón establecido: `^[a-z][a-z0-9_]+$`
 
 #### **Ejemplos de nombres CORRECTOS:**
+
 ```
 compute          # OK: minúsculas
 storage          # OK: minúsculas
@@ -257,6 +271,7 @@ backup_s3        # OK: minúsculas con números y guión bajo
 ```
 
 #### **Ejemplos de nombres INCORRECTOS:**
+
 ```
 Compute          # ERROR: Contiene mayúsculas
 STORAGE          # ERROR: Todo en mayúsculas
@@ -271,22 +286,27 @@ API_Gateway      # ERROR: Contiene mayúsculas
 ```
 
 #### **Reglas de nomenclatura:**
+
 - Debe comenzar con una letra minúscula (`a-z`)
 - Puede contener letras minúsculas, números y guiones bajos (`a-z`, `0-9`, `_`)
 - No puede contener mayúsculas, guiones (-), puntos (.), espacios o caracteres especiales
 - No puede comenzar con números o guiones bajos
 
 #### **Verificación:**
+
 ```bash
 # Validar nomenclatura de todos los módulos
 python3 scripts/verificar_nomenclatura.py
 ```
 
-
 # Entregables por sprint
+
 Aquí se encuentran los videos explicativos sobre la colaboración de cada uno de los integrantes, además de la sustentación de cada modificación, mencionando también posibles retos que se encuentren durante el desarrollo
 
 - **Video Sprint 1**: https://unipe-my.sharepoint.com/:v:/g/personal/a_flores_a_uni_pe/EaUcPsK_EINJk2p2Pyk5JXIBswQuvG7-clWvL5UooLAjYQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=zwEeWw
 
 - **Video Sprint 2**:
-https://unipe-my.sharepoint.com/:v:/g/personal/a_flores_a_uni_pe/EQx9SrEyp8tOjemAQ_W-fCYB6dVzZJMCIkIJDNh6bvSbYA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=3Yco2v
+  https://unipe-my.sharepoint.com/:v:/g/personal/a_flores_a_uni_pe/EQx9SrEyp8tOjemAQ_W-fCYB6dVzZJMCIkIJDNh6bvSbYA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=3Yco2v
+
+- **Video Sprint 3**:
+  https://unipe-my.sharepoint.com/:v:/g/personal/a_flores_a_uni_pe/EeIa2z1wDLtIii12fwglJZ8BSTVLfVg4AYMpPQtq8OLSkA?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=eP6WIL
